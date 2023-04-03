@@ -1,31 +1,29 @@
 mod actions;
 mod audio;
 mod loading;
+mod map;
 mod menu;
+mod physics;
 mod player;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
-use crate::player::PlayerPlugin;
+use crate::player::{Grounded, Player, PlayerPlugin, PLAYER_Z};
 
+use crate::map::MapPlugin;
+use crate::physics::{PhysicsPlugin, Velocity};
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
-// This example game uses States to separate logic
-// See https://bevy-cheatbook.github.io/programming/states.html
-// Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
-    // During the loading State the LoadingPlugin will load our assets
     #[default]
     Loading,
-    // During this State the actual game logic is executed
     Playing,
-    // Here the menu is drawn and waiting for player interaction
     Menu,
 }
 
@@ -38,12 +36,28 @@ impl Plugin for GamePlugin {
             .add_plugin(MenuPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
-            .add_plugin(PlayerPlugin);
+            .add_plugin(PlayerPlugin)
+            .add_plugin(PhysicsPlugin)
+            .add_plugin(MapPlugin);
 
         #[cfg(debug_assertions)]
         {
             app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-                .add_plugin(LogDiagnosticsPlugin::default());
+                .add_plugin(LogDiagnosticsPlugin::default())
+                .add_system(reset_player);
         }
+    }
+}
+
+fn reset_player(
+    input: Res<Input<KeyCode>>,
+    mut player: Query<(Entity, &mut Transform, &mut Velocity), With<Player>>,
+    mut commands: Commands,
+) {
+    if input.just_pressed(KeyCode::R) {
+        let (entity, mut transform, mut velocity) = player.single_mut();
+        commands.entity(entity).remove::<Grounded>();
+        transform.translation = Vec3::new(0., 0., PLAYER_Z);
+        velocity.0 = Vec2::ZERO;
     }
 }

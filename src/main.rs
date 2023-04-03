@@ -18,6 +18,7 @@ fn main() {
                 title: "Bevy game".to_string(), // ToDo
                 resolution: (800., 600.).into(),
                 canvas: Some("#bevy".to_owned()),
+                resizable: false,
                 ..default()
             }),
             ..default()

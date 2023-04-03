@@ -1,8 +1,7 @@
 use bevy::prelude::{Input, KeyCode, Res};
 
 pub enum GameControl {
-    Up,
-    Down,
+    Jump,
     Left,
     Right,
 }
@@ -10,17 +9,24 @@ pub enum GameControl {
 impl GameControl {
     pub fn pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
         match self {
-            GameControl::Up => {
-                keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up)
-            }
-            GameControl::Down => {
-                keyboard_input.pressed(KeyCode::S) || keyboard_input.pressed(KeyCode::Down)
-            }
+            GameControl::Jump => keyboard_input.pressed(KeyCode::Space),
             GameControl::Left => {
                 keyboard_input.pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left)
             }
             GameControl::Right => {
                 keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
+            }
+        }
+    }
+
+    pub fn just_pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
+        match self {
+            GameControl::Jump => keyboard_input.just_pressed(KeyCode::Space),
+            GameControl::Left => {
+                keyboard_input.just_pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left)
+            }
+            GameControl::Right => {
+                keyboard_input.just_pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
             }
         }
     }

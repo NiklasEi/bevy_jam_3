@@ -1,19 +1,44 @@
 use crate::actions::Actions;
 use crate::loading::TextureAssets;
+use crate::physics::{PhysicsSystems, Velocity};
 use crate::GameState;
 use bevy::prelude::*;
+
+pub const PLAYER_Z: f32 = 1.;
 
 pub struct PlayerPlugin;
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player {
+    pub(crate) size: Vec2,
+}
+
+#[derive(Component)]
+#[component(storage = "SparseSet")]
+pub struct Grounded;
+
+#[derive(Resource)]
+pub struct PlayerControls {
+    pub jump_power: f32,
+    pub speed: f32,
+}
+
+impl Default for PlayerControls {
+    fn default() -> Self {
+        PlayerControls {
+            jump_power: 3.5,
+            speed: 250.,
+        }
+    }
+}
 
 /// This plugin handles player related stuff like movement
 /// Player logic is only active during the State `GameState::Playing`
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(move_player.in_set(OnUpdate(GameState::Playing)));
+        app.init_resource::<PlayerControls>()
+            .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
+            .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities));
     }
 }
 
@@ -21,27 +46,28 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands
         .spawn(SpriteBundle {
             texture: textures.texture_bevy.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+            sprite: Sprite {
+                custom_size: Some(Vec2::splat(25.)),
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(0., 0., PLAYER_Z)),
             ..Default::default()
         })
-        .insert(Player);
+        .insert(Player {
+            size: Vec2::new(10., 10.),
+        })
+        .insert(Velocity(Vec2::ZERO));
 }
 
-fn move_player(
-    time: Res<Time>,
+fn apply_actions(
     actions: Res<Actions>,
-    mut player_query: Query<&mut Transform, With<Player>>,
+    player_controls: Res<PlayerControls>,
+    mut player_query: Query<&mut Velocity, With<Player>>,
 ) {
-    if actions.player_movement.is_none() {
-        return;
-    }
-    let speed = 150.;
-    let movement = Vec3::new(
-        actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-        actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-        0.,
-    );
-    for mut player_transform in &mut player_query {
-        player_transform.translation += movement;
+    let mut player = player_query.single_mut();
+    player.0.x = actions.player_movement;
+
+    if actions.attempt_jump {
+        player.0.y = player_controls.jump_power;
     }
 }
