@@ -6,6 +6,7 @@ mod menu;
 mod physics;
 mod player;
 mod ui;
+mod camera;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -20,6 +21,7 @@ use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use crate::camera::CameraPlugin;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -41,6 +43,7 @@ impl Plugin for GamePlugin {
             .add_plugin(PlayerPlugin)
             .add_plugin(PhysicsPlugin)
             .add_plugin(MapPlugin)
+            .add_plugin(CameraPlugin)
             .add_plugin(UiPlugin);
 
         #[cfg(debug_assertions)]
