@@ -64,3 +64,6 @@ fn reset_player(
         velocity.0 = Vec2::ZERO;
     }
 }
+
+pub const WIDTH: f32 = 800.;
+pub const HEIGHT: f32 = 600.;

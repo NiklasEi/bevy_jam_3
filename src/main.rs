@@ -5,12 +5,9 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
-use bevy_game::GamePlugin;
+use bevy_game::{GamePlugin, HEIGHT, WIDTH};
 use std::io::Cursor;
 use winit::window::Icon;
-
-pub const WIDTH: f32 = 800.;
-pub const HEIGHT: f32 = 600.;
 
 fn main() {
     App::new()
