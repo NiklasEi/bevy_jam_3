@@ -5,6 +5,7 @@ mod map;
 mod menu;
 mod physics;
 mod player;
+mod ui;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -14,6 +15,7 @@ use crate::player::{Grounded, Player, PlayerPlugin, PLAYER_Z};
 
 use crate::map::MapPlugin;
 use crate::physics::{PhysicsPlugin, Velocity};
+use crate::ui::UiPlugin;
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
@@ -38,7 +40,8 @@ impl Plugin for GamePlugin {
             .add_plugin(InternalAudioPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(PhysicsPlugin)
-            .add_plugin(MapPlugin);
+            .add_plugin(MapPlugin)
+            .add_plugin(UiPlugin);
 
         #[cfg(debug_assertions)]
         {

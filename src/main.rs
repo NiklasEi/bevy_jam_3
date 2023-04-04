@@ -9,6 +9,9 @@ use bevy_game::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
+pub const WIDTH: f32 = 800.;
+pub const HEIGHT: f32 = 600.;
+
 fn main() {
     App::new()
         .insert_resource(Msaa::Off)
@@ -16,7 +19,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Bevy game".to_string(), // ToDo
-                resolution: (800., 600.).into(),
+                resolution: (WIDTH, HEIGHT).into(),
                 canvas: Some("#bevy".to_owned()),
                 resizable: false,
                 ..default()

@@ -62,12 +62,13 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
 fn apply_actions(
     actions: Res<Actions>,
     player_controls: Res<PlayerControls>,
-    mut player_query: Query<&mut Velocity, With<Player>>,
+    mut player_query: Query<(Entity, &mut Velocity), With<Player>>,
+    can_jump: Query<&Grounded, With<Player>>,
 ) {
-    let mut player = player_query.single_mut();
-    player.0.x = actions.player_movement;
+    let (player, mut velocity) = player_query.single_mut();
+    velocity.0.x = actions.player_movement;
 
-    if actions.attempt_jump {
-        player.0.y = player_controls.jump_power;
+    if actions.attempt_jump && can_jump.contains(player) {
+        velocity.0.y = player_controls.jump_power;
     }
 }
