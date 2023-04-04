@@ -1,3 +1,4 @@
+use crate::camera::GameCamera;
 use crate::loading::FontAssets;
 use crate::GameState;
 use bevy::prelude::*;
@@ -35,7 +36,7 @@ fn setup_menu(
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default()).insert(GameCamera);
     commands
         .spawn(ButtonBundle {
             style: Style {

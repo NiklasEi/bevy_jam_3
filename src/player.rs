@@ -18,6 +18,15 @@ pub struct Player {
 pub struct Grounded;
 
 #[derive(Resource)]
+pub struct Hunger(f32);
+
+impl Default for Hunger {
+    fn default() -> Self {
+        Hunger(100.)
+    }
+}
+
+#[derive(Resource)]
 pub struct PlayerControls {
     pub jump_power: f32,
     pub speed: f32,
@@ -36,7 +45,8 @@ impl Default for PlayerControls {
 /// Player logic is only active during the State `GameState::Playing`
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<PlayerControls>()
+        app.init_resource::<Hunger>()
+            .init_resource::<PlayerControls>()
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
             .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities));
     }
@@ -54,7 +64,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             ..Default::default()
         })
         .insert(Player {
-            size: Vec2::new(10., 10.),
+            size: Vec2::new(25., 25.),
         })
         .insert(Velocity(Vec2::ZERO));
 }

@@ -1,5 +1,7 @@
 use crate::GameState;
 use bevy::prelude::*;
+use bevy::render::render_resource::{AddressMode, SamplerDescriptor};
+use bevy::render::texture::ImageSampler;
 use bevy_asset_loader::prelude::*;
 use bevy_kira_audio::AudioSource;
 
@@ -15,7 +17,8 @@ impl Plugin for LoadingPlugin {
         )
         .add_collection_to_loading_state::<_, FontAssets>(GameState::Loading)
         .add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading)
-        .add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading);
+        .add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading)
+        .add_system(configure_samplers.in_schedule(OnExit(GameState::Loading)));
     }
 }
 
@@ -38,4 +41,26 @@ pub struct AudioAssets {
 pub struct TextureAssets {
     #[asset(path = "textures/bevy.png")]
     pub texture_bevy: Handle<Image>,
+    #[asset(path = "textures/ground.png")]
+    pub ground: Handle<Image>,
+    #[asset(path = "textures/platform.png")]
+    pub platform: Handle<Image>,
+    #[asset(path = "textures/wall.png")]
+    pub wall: Handle<Image>,
+}
+
+fn configure_samplers(texture_assets: Res<TextureAssets>, mut textures: ResMut<Assets<Image>>) {
+    let mut repeat_descriptor = SamplerDescriptor::default();
+    repeat_descriptor.address_mode_u = AddressMode::Repeat;
+    repeat_descriptor.address_mode_v = AddressMode::Repeat;
+    repeat_descriptor.address_mode_w = AddressMode::Repeat;
+
+    let mut ground = textures.get_mut(&texture_assets.ground).unwrap();
+    ground.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor.clone());
+
+    let mut platform = textures.get_mut(&texture_assets.platform).unwrap();
+    platform.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor.clone());
+
+    let mut wall = textures.get_mut(&texture_assets.wall).unwrap();
+    wall.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor);
 }

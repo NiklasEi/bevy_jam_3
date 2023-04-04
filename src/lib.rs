@@ -1,12 +1,12 @@
 mod actions;
 mod audio;
+mod camera;
 mod loading;
 mod map;
 mod menu;
 mod physics;
 mod player;
 mod ui;
-mod camera;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -14,6 +14,7 @@ use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::{Grounded, Player, PlayerPlugin, PLAYER_Z};
 
+use crate::camera::CameraPlugin;
 use crate::map::MapPlugin;
 use crate::physics::{PhysicsPlugin, Velocity};
 use crate::ui::UiPlugin;
@@ -21,7 +22,7 @@ use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
-use crate::camera::CameraPlugin;
+use bevy_editor_pls::prelude::*;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -50,6 +51,7 @@ impl Plugin for GamePlugin {
         {
             app.add_plugin(FrameTimeDiagnosticsPlugin::default())
                 .add_plugin(LogDiagnosticsPlugin::default())
+                .add_plugin(EditorPlugin::new().in_new_window(Window::default()))
                 .add_system(reset_player);
         }
     }

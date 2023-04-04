@@ -4,7 +4,7 @@ use crate::{GameState, HEIGHT, WIDTH};
 pub use bevy::prelude::*;
 
 pub const PLATFORM_Z: f32 = 0.;
-pub const PLATFORM_HEIGHT: f32 = 25.;
+pub const PLATFORM_HEIGHT: f32 = 32.;
 
 pub struct MapPlugin;
 
@@ -26,15 +26,15 @@ pub struct Collider {
 }
 
 fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
-    let center = Vec2::new(50., 20.);
-    let size = Vec2::new(60., PLATFORM_HEIGHT);
+    let center = Vec2::new(50., -150.);
+    let size = Vec2::new(64., PLATFORM_HEIGHT);
     commands
         .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(size),
                 ..default()
             },
-            texture: textures.texture_bevy.clone(),
+            texture: textures.platform.clone(),
             transform: Transform::from_translation(Vec3::new(center.x, center.y, PLATFORM_Z)),
             ..default()
         })
@@ -48,7 +48,7 @@ fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
                 custom_size: Some(size_start_wall),
                 ..default()
             },
-            texture: textures.texture_bevy.clone(),
+            texture: textures.wall.clone(),
             transform: Transform::from_translation(Vec3::new(
                 center_start_wall.x,
                 center_start_wall.y,
@@ -76,7 +76,7 @@ fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) 
                 custom_size: Some(size),
                 ..default()
             },
-            texture: textures.texture_bevy.clone(),
+            texture: textures.ground.clone(),
             transform: Transform::from_translation(Vec3::new(center.x, center.y, PLATFORM_Z)),
             ..default()
         })
