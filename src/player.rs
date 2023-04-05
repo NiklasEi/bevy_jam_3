@@ -48,9 +48,16 @@ impl Plugin for PlayerPlugin {
         app.init_resource::<Hunger>()
             .init_resource::<PlayerControls>()
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities));
+            .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities))
+            .add_system(
+                lose_on_falling
+                    .run_if(in_state(GameState::Playing))
+                    .after(PhysicsSystems::Move),
+            );
     }
 }
+
+fn lose_on_falling() {}
 
 fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands

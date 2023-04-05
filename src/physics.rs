@@ -1,6 +1,6 @@
-use crate::map::{Collider, CurrentChunk};
+use crate::map::{Collider, CurrentChunk, CHUNK_WIDTH};
 use crate::player::{Grounded, Player, PlayerControls};
-use crate::{GameState, WIDTH};
+use crate::GameState;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
@@ -49,6 +49,7 @@ fn move_player(
     if player_velocity.0 == Vec2::ZERO {
         return;
     }
+    info!("Checking player collisions");
     let mut grounded = false;
 
     let mut movement_y =
@@ -106,7 +107,7 @@ fn move_player(
         }
     }
     player_transform.translation = potential_new_position_x;
-    let chunk = (player_transform.translation.x.abs() / WIDTH).floor() as usize;
+    let chunk = (player_transform.translation.x.abs() / CHUNK_WIDTH).floor() as usize;
     if chunk > current_chunk.0 {
         current_chunk.0 = chunk;
     }

@@ -2,9 +2,14 @@ use crate::loading::TextureAssets;
 use crate::physics::PhysicsSystems;
 use crate::{GameState, HEIGHT, WIDTH};
 pub use bevy::prelude::*;
+use rand::Rng;
 
 pub const PLATFORM_Z: f32 = 0.;
-pub const PLATFORM_HEIGHT: f32 = 32.;
+pub const PLATFORM_HEIGHT: f32 = TILE_SIZE;
+pub const CHUNK_TILES: usize = 16;
+pub const TILE_SIZE: f32 = 32.;
+pub const CHUNK_WIDTH: f32 = CHUNK_TILES as f32 * TILE_SIZE;
+pub const TUTORIAL_CHUNKS: usize = 5;
 
 pub struct MapPlugin;
 
@@ -40,47 +45,77 @@ fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
         })
         .insert(Collider { size });
 
-    let center_start_wall = Vec2::new(-WIDTH / 2. + PLATFORM_HEIGHT / 2., PLATFORM_HEIGHT / 2.);
-    let size_start_wall = Vec2::new(PLATFORM_HEIGHT, HEIGHT - PLATFORM_HEIGHT);
-    commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(size_start_wall),
+    for brick in 1..20 {
+        let center_start_wall = Vec2::new(
+            -WIDTH / 2. + TILE_SIZE / 2.,
+            -HEIGHT / 2. + TILE_SIZE / 2. + brick as f32 * TILE_SIZE,
+        );
+        let size_start_wall = Vec2::new(TILE_SIZE, TILE_SIZE);
+        commands
+            .spawn(SpriteBundle {
+                texture: textures.wall.clone(),
+                transform: Transform::from_translation(Vec3::new(
+                    center_start_wall.x,
+                    center_start_wall.y,
+                    PLATFORM_Z,
+                )),
                 ..default()
-            },
-            texture: textures.wall.clone(),
-            transform: Transform::from_translation(Vec3::new(
-                center_start_wall.x,
-                center_start_wall.y,
-                PLATFORM_Z,
-            )),
-            ..default()
-        })
-        .insert(Collider {
-            size: size_start_wall,
-        });
-    spawn_chunk(&mut commands, &textures, 0);
-    spawn_chunk(&mut commands, &textures, 1);
+            })
+            .insert(Collider {
+                size: size_start_wall,
+            });
+    }
+    spawn_tutorial_chunks(&mut commands, &textures);
+}
+
+fn spawn_tutorial_chunks(commands: &mut Commands, textures: &TextureAssets) {
+    for index in 0..TUTORIAL_CHUNKS {
+        for tile in 0..CHUNK_TILES {
+            let center = Vec2::new(
+                index as f32 * CHUNK_WIDTH - WIDTH / 2. + TILE_SIZE / 2. + tile as f32 * TILE_SIZE,
+                -HEIGHT / 2. + TILE_SIZE / 2.,
+            );
+            let size = Vec2::new(TILE_SIZE, TILE_SIZE);
+            commands
+                .spawn(SpriteBundle {
+                    texture: textures.ground.clone(),
+                    transform: Transform::from_translation(Vec3::new(
+                        center.x, center.y, PLATFORM_Z,
+                    )),
+                    ..default()
+                })
+                .insert(Collider { size });
+        }
+    }
 }
 
 #[derive(Default, Resource)]
 pub struct CurrentChunk(pub(crate) usize);
 
 fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) {
+    if index < TUTORIAL_CHUNKS {
+        return;
+    }
     info!("Spawning chunk {index}");
-    let center = Vec2::new(index as f32 * WIDTH, -HEIGHT / 2. + PLATFORM_HEIGHT / 2.);
-    let size = Vec2::new(WIDTH, PLATFORM_HEIGHT);
-    commands
-        .spawn(SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(size),
+    let hole1 = rand::thread_rng().gen_range(0..CHUNK_TILES);
+    let hole2 = rand::thread_rng().gen_range(0..CHUNK_TILES);
+    for tile in 0..CHUNK_TILES {
+        if tile == hole1 || tile == hole2 {
+            continue;
+        }
+        let center = Vec2::new(
+            index as f32 * CHUNK_WIDTH - WIDTH / 2. + TILE_SIZE / 2. + tile as f32 * TILE_SIZE,
+            -HEIGHT / 2. + PLATFORM_HEIGHT / 2.,
+        );
+        let size = Vec2::new(TILE_SIZE, PLATFORM_HEIGHT);
+        commands
+            .spawn(SpriteBundle {
+                texture: textures.ground.clone(),
+                transform: Transform::from_translation(Vec3::new(center.x, center.y, PLATFORM_Z)),
                 ..default()
-            },
-            texture: textures.ground.clone(),
-            transform: Transform::from_translation(Vec3::new(center.x, center.y, PLATFORM_Z)),
-            ..default()
-        })
-        .insert(Collider { size });
+            })
+            .insert(Collider { size });
+    }
 }
 
 fn spawn_chunk_system(

@@ -15,7 +15,7 @@ impl Plugin for CameraPlugin {
     }
 }
 
-const THRESHOLD: f32 = 100.;
+const THRESHOLD: f32 = 0.;
 
 #[derive(Component)]
 pub struct GameCamera;
