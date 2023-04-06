@@ -1,10 +1,11 @@
 use crate::actions::Actions;
 use crate::loading::TextureAssets;
+use crate::map::TILE_SIZE;
 use crate::physics::{PhysicsSystems, Velocity};
-use crate::GameState;
+use crate::{GameState, HEIGHT, WIDTH};
 use bevy::prelude::*;
 
-pub const PLAYER_Z: f32 = 1.;
+pub const PLAYER_Z: f32 = 5.;
 
 pub struct PlayerPlugin;
 
@@ -18,11 +19,20 @@ pub struct Player {
 pub struct Grounded;
 
 #[derive(Resource)]
-pub struct Hunger(f32);
+pub struct Hunger(pub(crate) f32);
 
 impl Default for Hunger {
     fn default() -> Self {
         Hunger(100.)
+    }
+}
+
+#[derive(Resource)]
+pub struct HungerPerSecond(f32);
+
+impl Default for HungerPerSecond {
+    fn default() -> Self {
+        HungerPerSecond(1.)
     }
 }
 
@@ -47,17 +57,29 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Hunger>()
             .init_resource::<PlayerControls>()
+            .init_resource::<HungerPerSecond>()
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
             .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities))
-            .add_system(
-                lose_on_falling
-                    .run_if(in_state(GameState::Playing))
-                    .after(PhysicsSystems::Move),
+            .add_systems(
+                (lose_on_falling.after(PhysicsSystems::Move), process_food)
+                    .in_set(OnUpdate(GameState::Playing)),
             );
     }
 }
 
-fn lose_on_falling() {}
+fn lose_on_falling(player: Query<&Transform, With<Player>>) {
+    if player.single().translation.y < TILE_SIZE {
+        println!("Fell!");
+    }
+}
+
+fn process_food(
+    time: Res<Time>,
+    hunger_per_second: Res<HungerPerSecond>,
+    mut hunger: ResMut<Hunger>,
+) {
+    hunger.0 -= hunger_per_second.0 * time.delta_seconds();
+}
 
 fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands
@@ -67,7 +89,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
                 custom_size: Some(Vec2::splat(25.)),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(0., 0., PLAYER_Z)),
+            transform: Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z)),
             ..Default::default()
         })
         .insert(Player {

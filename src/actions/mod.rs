@@ -24,5 +24,5 @@ pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<In
     actions.player_movement = get_movement(GameControl::Right, &keyboard_input)
         - get_movement(GameControl::Left, &keyboard_input);
 
-    actions.attempt_jump = GameControl::Jump.just_pressed(&keyboard_input);
+    actions.attempt_jump = GameControl::Jump.pressed(&keyboard_input);
 }

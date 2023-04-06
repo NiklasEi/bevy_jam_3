@@ -1,4 +1,4 @@
-use crate::map::{Collider, CurrentChunk, CHUNK_WIDTH};
+use crate::map::{Collider, CurrentChunk, Solid, CHUNK_WIDTH};
 use crate::player::{Grounded, Player, PlayerControls};
 use crate::GameState;
 use bevy::math::Vec3Swizzles;
@@ -41,7 +41,7 @@ fn move_player(
     time: Res<Time>,
     player_controls: Res<PlayerControls>,
     mut player: Query<(Entity, &mut Transform, &mut Velocity, &Player)>,
-    colliders: Query<(&Transform, &Collider), Without<Player>>,
+    colliders: Query<(&Transform, &Collider), (Without<Player>, With<Solid>)>,
     mut current_chunk: ResMut<CurrentChunk>,
 ) {
     let (player_entity, mut player_transform, mut player_velocity, player) = player.single_mut();

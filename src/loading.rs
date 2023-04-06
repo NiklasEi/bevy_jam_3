@@ -47,6 +47,17 @@ pub struct TextureAssets {
     pub platform: Handle<Image>,
     #[asset(path = "textures/wall.png")]
     pub wall: Handle<Image>,
+    #[asset(path = "textures/truffle.png")]
+    pub truffle: Handle<Image>,
+    #[asset(
+        collection(typed),
+        paths(
+            "textures/food/food1.png",
+            "textures/food/food2.png",
+            "textures/food/food3.png"
+        )
+    )]
+    pub food: Vec<Handle<Image>>,
 }
 
 fn configure_samplers(texture_assets: Res<TextureAssets>, mut textures: ResMut<Assets<Image>>) {

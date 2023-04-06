@@ -1,6 +1,6 @@
 use crate::physics::PhysicsSystems;
 use crate::player::Player;
-use crate::GameState;
+use crate::{GameState, WIDTH};
 use bevy::prelude::*;
 
 pub struct CameraPlugin;
@@ -33,8 +33,8 @@ fn follow_player(
             delta + THRESHOLD
         };
         camera_transform.translation.x += move_by;
-        if camera_transform.translation.x < 0. {
-            camera_transform.translation.x = 0.;
+        if camera_transform.translation.x < WIDTH / 2. {
+            camera_transform.translation.x = WIDTH / 2.;
         }
     }
 }

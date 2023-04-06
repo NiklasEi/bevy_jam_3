@@ -1,6 +1,6 @@
 use crate::camera::GameCamera;
 use crate::loading::FontAssets;
-use crate::GameState;
+use crate::{GameState, HEIGHT, WIDTH};
 use bevy::prelude::*;
 
 pub struct MenuPlugin;
@@ -36,7 +36,12 @@ fn setup_menu(
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
 ) {
-    commands.spawn(Camera2dBundle::default()).insert(GameCamera);
+    commands
+        .spawn(Camera2dBundle {
+            transform: Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., 999.9)),
+            ..default()
+        })
+        .insert(GameCamera);
     commands
         .spawn(ButtonBundle {
             style: Style {

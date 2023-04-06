@@ -1,6 +1,7 @@
 mod actions;
 mod audio;
 mod camera;
+mod food;
 mod loading;
 mod map;
 mod menu;
@@ -15,6 +16,7 @@ use crate::menu::MenuPlugin;
 use crate::player::{Grounded, Player, PlayerPlugin, PLAYER_Z};
 
 use crate::camera::CameraPlugin;
+use crate::food::FoodPlugin;
 use crate::map::MapPlugin;
 use crate::physics::{PhysicsPlugin, Velocity};
 use crate::ui::UiPlugin;
@@ -45,7 +47,8 @@ impl Plugin for GamePlugin {
             .add_plugin(PhysicsPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(CameraPlugin)
-            .add_plugin(UiPlugin);
+            .add_plugin(UiPlugin)
+            .add_plugin(FoodPlugin);
 
         #[cfg(debug_assertions)]
         {
@@ -65,7 +68,7 @@ fn reset_player(
     if input.just_pressed(KeyCode::R) {
         let (entity, mut transform, mut velocity) = player.single_mut();
         commands.entity(entity).remove::<Grounded>();
-        transform.translation = Vec3::new(0., 0., PLAYER_Z);
+        transform.translation = Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z);
         velocity.0 = Vec2::ZERO;
     }
 }

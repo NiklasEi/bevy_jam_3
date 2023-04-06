@@ -18,18 +18,6 @@ impl GameControl {
             }
         }
     }
-
-    pub fn just_pressed(&self, keyboard_input: &Res<Input<KeyCode>>) -> bool {
-        match self {
-            GameControl::Jump => keyboard_input.just_pressed(KeyCode::Space),
-            GameControl::Left => {
-                keyboard_input.just_pressed(KeyCode::A) || keyboard_input.pressed(KeyCode::Left)
-            }
-            GameControl::Right => {
-                keyboard_input.just_pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
-            }
-        }
-    }
 }
 
 pub fn get_movement(control: GameControl, input: &Res<Input<KeyCode>>) -> f32 {
