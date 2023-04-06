@@ -13,7 +13,6 @@ pub const CHUNK_WIDTH: f32 = CHUNK_TILES as f32 * TILE_SIZE;
 pub const TUTORIAL_CHUNKS: usize = 5;
 pub const MAP_GEN_DOUBLE_HOLES_FROM_CHUNK: usize = 12;
 pub const MAP_GEN_FOOD_ON_GROUND: f32 = 0.05;
-pub const MAP_GEN_FOOD_ON_PLATFORM: f32 = 0.10;
 
 pub struct MapPlugin;
 
@@ -95,10 +94,9 @@ fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) 
     let hole1 = random.gen_range(0..CHUNK_TILES);
     let hole2 = random.gen_range(0..CHUNK_TILES);
     for tile in 0..CHUNK_TILES {
-        if tile == hole1 || tile == hole2 {
-            continue;
-        } else if index > MAP_GEN_DOUBLE_HOLES_FROM_CHUNK
-            && (tile == hole1 + 1 || tile == hole2 + 1)
+        if tile == hole1
+            || tile == hole2
+            || (index > MAP_GEN_DOUBLE_HOLES_FROM_CHUNK && (tile == hole1 + 1 || tile == hole2 + 1))
         {
             continue;
         }
@@ -109,7 +107,7 @@ fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) 
         let size = Vec2::new(TILE_SIZE, PLATFORM_HEIGHT);
         spawn_tile(commands, size, center, textures.ground.clone());
         if random.gen::<f32>() < MAP_GEN_FOOD_ON_GROUND {
-            spawn_random_food(&textures, commands, center, &mut random);
+            spawn_random_food(textures, commands, center, &mut random);
         }
     }
 }

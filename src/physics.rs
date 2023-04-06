@@ -68,12 +68,10 @@ fn move_player(
 
             if movement_y.y.abs() < intersect.height() {
                 movement_y.y = 0.;
-            } else {
-                if movement_y.y > 0. {
-                    movement_y.y -= intersect.height();
-                } else if movement_y.y < 0. {
-                    movement_y.y += intersect.height();
-                }
+            } else if movement_y.y > 0. {
+                movement_y.y -= intersect.height();
+            } else if movement_y.y < 0. {
+                movement_y.y += intersect.height();
             }
 
             potential_new_position_y = player_transform.translation + movement_y;
@@ -93,12 +91,10 @@ fn move_player(
         while !intersect.is_empty() {
             if movement_x.x.abs() < intersect.width() {
                 movement_x.x = 0.;
-            } else {
-                if movement_x.x > 0. {
-                    movement_x.x -= intersect.width();
-                } else if movement_x.x < 0. {
-                    movement_x.x += intersect.width();
-                }
+            } else if movement_x.x > 0. {
+                movement_x.x -= intersect.width();
+            } else if movement_x.x < 0. {
+                movement_x.x += intersect.width();
             }
 
             potential_new_position_x = potential_new_position_y + movement_x;

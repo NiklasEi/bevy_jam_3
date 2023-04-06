@@ -65,10 +65,12 @@ pub struct TextureAssets {
 }
 
 fn configure_samplers(texture_assets: Res<TextureAssets>, mut textures: ResMut<Assets<Image>>) {
-    let mut repeat_descriptor = SamplerDescriptor::default();
-    repeat_descriptor.address_mode_u = AddressMode::Repeat;
-    repeat_descriptor.address_mode_v = AddressMode::Repeat;
-    repeat_descriptor.address_mode_w = AddressMode::Repeat;
+    let repeat_descriptor = SamplerDescriptor {
+        address_mode_u: AddressMode::Repeat,
+        address_mode_v: AddressMode::Repeat,
+        address_mode_w: AddressMode::Repeat,
+        ..default()
+    };
 
     let mut ground = textures.get_mut(&texture_assets.ground).unwrap();
     ground.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor.clone());
