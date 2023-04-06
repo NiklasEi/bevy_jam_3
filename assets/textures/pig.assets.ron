@@ -1,0 +1,9 @@
+({
+    "pig":TextureAtlas (
+        path: "textures/pig.png",
+        tile_size_x: 32.,
+        tile_size_y: 16.,
+        columns: 4,
+        rows: 1
+    )
+})

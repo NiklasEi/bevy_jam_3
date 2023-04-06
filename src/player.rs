@@ -51,6 +51,9 @@ impl Default for PlayerControls {
     }
 }
 
+#[derive(Component)]
+struct AnimationTimer(Timer, usize);
+
 /// This plugin handles player related stuff like movement
 /// Player logic is only active during the State `GameState::Playing`
 impl Plugin for PlayerPlugin {
@@ -63,13 +66,26 @@ impl Plugin for PlayerPlugin {
             .add_systems(
                 (lose_on_falling.after(PhysicsSystems::Move), process_food)
                     .in_set(OnUpdate(GameState::Playing)),
-            );
+            )
+            .add_system(animate_atlases);
     }
 }
 
 fn lose_on_falling(player: Query<&Transform, With<Player>>) {
     if player.single().translation.y < TILE_SIZE {
         println!("Fell!");
+    }
+}
+
+fn animate_atlases(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationTimer, &mut TextureAtlasSprite)>,
+) {
+    for (mut timer, mut sprite) in &mut query {
+        timer.0.tick(time.delta());
+        if timer.0.finished() {
+            sprite.index = (sprite.index + 1) % timer.1;
+        }
     }
 }
 
@@ -83,30 +99,33 @@ fn process_food(
 
 fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands
-        .spawn(SpriteBundle {
-            texture: textures.texture_bevy.clone(),
-            sprite: Sprite {
-                custom_size: Some(Vec2::splat(25.)),
-                ..default()
-            },
+        .spawn(SpriteSheetBundle {
+            texture_atlas: textures.pig.clone(),
+            sprite: TextureAtlasSprite::new(0),
             transform: Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z)),
             ..Default::default()
         })
         .insert(Player {
-            size: Vec2::new(25., 25.),
+            size: Vec2::new(30., 15.),
         })
-        .insert(Velocity(Vec2::ZERO));
+        .insert(Velocity(Vec2::ZERO))
+        .insert(AnimationTimer(
+            Timer::from_seconds(0.1, TimerMode::Repeating),
+            4,
+        ));
 }
 
 fn apply_actions(
     actions: Res<Actions>,
     player_controls: Res<PlayerControls>,
-    mut player_query: Query<(Entity, &mut Velocity), With<Player>>,
+    mut player_query: Query<(Entity, &mut Velocity, &mut TextureAtlasSprite), With<Player>>,
     can_jump: Query<&Grounded, With<Player>>,
 ) {
-    let (player, mut velocity) = player_query.single_mut();
+    let (player, mut velocity, mut sprite) = player_query.single_mut();
     velocity.0.x = actions.player_movement;
-
+    if velocity.0.x.abs() > 0. {
+        sprite.flip_x = velocity.0.x < 0.;
+    }
     if actions.attempt_jump && can_jump.contains(player) {
         velocity.0.y = player_controls.jump_power;
     }

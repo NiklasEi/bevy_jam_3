@@ -13,16 +13,20 @@ fn main() {
     App::new()
         .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Bevy game".to_string(), // ToDo
-                resolution: (WIDTH, HEIGHT).into(),
-                canvas: Some("#bevy".to_owned()),
-                resizable: false,
-                ..default()
-            }),
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Bevy game".to_string(), // ToDo
+                        resolution: (WIDTH, HEIGHT).into(),
+                        canvas: Some("#bevy".to_owned()),
+                        resizable: false,
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
         .add_plugin(GamePlugin)
         .add_system(set_window_icon.on_startup())
         .run();

@@ -4,7 +4,7 @@ use crate::GameState;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
-const GRAVITY: f32 = 10.;
+const GRAVITY: f32 = 12.;
 
 pub struct PhysicsPlugin;
 
