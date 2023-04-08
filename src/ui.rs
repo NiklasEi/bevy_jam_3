@@ -7,21 +7,21 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems((spawn_score, spawn_hunger).in_schedule(OnEnter(GameState::Playing)))
+        app.add_systems((spawn_score, spawn_hunger).in_schedule(OnEnter(GameState::Prepare)))
             .add_systems(
                 (update_score_text, update_hunger_text).in_set(OnUpdate(GameState::Playing)),
             );
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct Score(f32);
 
 #[derive(Component)]
 struct ScoreText;
 
 fn spawn_score(mut commands: Commands, font_assets: Res<FontAssets>) {
-    commands.insert_resource(Score(0.));
+    commands.init_resource::<Score>();
     commands
         .spawn(NodeBundle {
             style: Style {
@@ -75,7 +75,6 @@ fn update_score_text(score: Res<Score>, mut score_text: Query<&mut Text, With<Sc
 struct HungerText;
 
 fn spawn_hunger(mut commands: Commands, font_assets: Res<FontAssets>) {
-    commands.insert_resource(Score(0.));
     commands
         .spawn(NodeBundle {
             style: Style {
@@ -122,5 +121,5 @@ fn update_hunger_text(hunger: Res<Hunger>, mut hunger_text: Query<&mut Text, Wit
     if !hunger.is_changed() {
         return;
     }
-    hunger_text.single_mut().sections[0].value = format!("{:.0}", hunger.0);
+    hunger_text.single_mut().sections[0].value = format!("{:.0}", hunger.0.clamp(0., 100.));
 }

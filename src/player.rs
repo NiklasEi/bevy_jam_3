@@ -14,17 +14,20 @@ pub struct Player {
     pub(crate) size: Vec2,
 }
 
-#[derive(Resource)]
+#[derive(Resource, Reflect, Default)]
+#[reflect(Resource)]
 pub struct TakeInputs(pub(crate) bool);
 
-#[derive(Resource)]
+#[derive(Resource, Reflect, Default)]
+#[reflect(Resource)]
 pub struct Falling(pub(crate) bool);
 
 #[derive(Component)]
 #[component(storage = "SparseSet")]
 pub struct Grounded;
 
-#[derive(Resource)]
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
 pub struct Hunger(pub(crate) f32);
 
 impl Default for Hunger {
@@ -33,16 +36,18 @@ impl Default for Hunger {
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
 pub struct HungerPerSecond(f32);
 
 impl Default for HungerPerSecond {
     fn default() -> Self {
-        HungerPerSecond(1.)
+        HungerPerSecond(10.)
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
 pub struct PlayerControls {
     pub jump_power: f32,
     pub speed: f32,
@@ -69,13 +74,13 @@ impl Plugin for PlayerPlugin {
             .init_resource::<HungerPerSecond>()
             .insert_resource(TakeInputs(true))
             .insert_resource(Falling(false))
-            .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
+            .add_system(spawn_player.in_schedule(OnEnter(GameState::Prepare)))
             .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities))
             .add_systems(
                 (lose_on_falling.after(PhysicsSystems::Move), process_food)
                     .in_set(OnUpdate(GameState::Playing)),
             )
-            .add_system(animate_atlases);
+            .add_system(animate_player.after(apply_actions));
     }
 }
 
@@ -85,11 +90,16 @@ fn lose_on_falling(player: Query<&Transform, With<Player>>) {
     }
 }
 
-fn animate_atlases(
+fn animate_player(
     time: Res<Time>,
-    mut query: Query<(&mut AnimationTimer, &mut TextureAtlasSprite)>,
+    mut query: Query<(&mut AnimationTimer, &mut TextureAtlasSprite, &Velocity), With<Player>>,
 ) {
-    for (mut timer, mut sprite) in &mut query {
+    for (mut timer, mut sprite, velocity) in &mut query {
+        if velocity.0.length() < f32::EPSILON || velocity.0.y.abs() > 0. {
+            sprite.index = 0;
+            timer.0.reset();
+            continue;
+        }
         timer.0.tick(time.delta());
         if timer.0.finished() {
             sprite.index = (sprite.index + 1) % timer.1;
@@ -99,10 +109,14 @@ fn animate_atlases(
 
 fn process_food(
     time: Res<Time>,
+    mut state: ResMut<NextState<GameState>>,
     hunger_per_second: Res<HungerPerSecond>,
     mut hunger: ResMut<Hunger>,
 ) {
     hunger.0 -= hunger_per_second.0 * time.delta_seconds();
+    if hunger.0 < 0. {
+        state.set(GameState::Restart);
+    }
 }
 
 fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {

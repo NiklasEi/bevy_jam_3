@@ -9,8 +9,8 @@ mod map;
 mod menu;
 mod physics;
 mod player;
-mod ui;
 mod reset;
+mod ui;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -22,15 +22,13 @@ use crate::camera::CameraPlugin;
 use crate::food::FoodPlugin;
 use crate::map::MapPlugin;
 use crate::physics::PhysicsPlugin;
+use crate::reset::ResetPlugin;
 use crate::ui::UiPlugin;
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_editor_pls::prelude::*;
-#[cfg(debug_assertions)]
-use crate::reset::reset_player;
-use crate::reset::ResetPlugin;
 
 pub const WIDTH: f32 = 800.;
 pub const HEIGHT: f32 = 600.;
@@ -40,8 +38,9 @@ enum GameState {
     #[default]
     Loading,
     Menu,
+    Prepare,
     Playing,
-    Restart
+    Restart,
 }
 
 pub struct GamePlugin;
@@ -49,6 +48,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<GameState>()
+            .add_system(start_level.in_set(OnUpdate(GameState::Prepare)))
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
             .add_plugin(ActionsPlugin)
@@ -66,7 +66,17 @@ impl Plugin for GamePlugin {
             app.add_plugin(FrameTimeDiagnosticsPlugin::default())
                 .add_plugin(LogDiagnosticsPlugin::default())
                 .add_plugin(EditorPlugin::new().in_new_window(Window::default()))
-                .add_system(reset_player);
+                .add_system(reset);
         }
+    }
+}
+
+fn start_level(mut state: ResMut<NextState<GameState>>) {
+    state.set(GameState::Playing);
+}
+
+fn reset(mut state: ResMut<NextState<GameState>>, input: Res<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::R) {
+        state.set(GameState::Restart);
     }
 }

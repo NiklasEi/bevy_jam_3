@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::actions::game_control::{get_movement, GameControl};
-use crate::GameState;
 use crate::player::TakeInputs;
+use crate::GameState;
 
 mod game_control;
 
@@ -21,7 +21,11 @@ pub struct Actions {
     pub attempt_jump: bool,
 }
 
-pub fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<KeyCode>>, take_inputs: Res<TakeInputs>) {
+pub fn set_movement_actions(
+    mut actions: ResMut<Actions>,
+    keyboard_input: Res<Input<KeyCode>>,
+    take_inputs: Res<TakeInputs>,
+) {
     if !take_inputs.0 {
         actions.player_movement = 0.;
         actions.attempt_jump = false;

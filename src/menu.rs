@@ -17,9 +17,9 @@ impl Plugin for MenuPlugin {
 }
 
 #[derive(Resource)]
-struct ButtonColors {
-    normal: Color,
-    hovered: Color,
+pub struct ButtonColors {
+    pub(crate) normal: Color,
+    pub(crate) hovered: Color,
 }
 
 impl Default for ButtonColors {
@@ -73,11 +73,12 @@ fn click_play_button(
         (&Interaction, &mut BackgroundColor),
         (Changed<Interaction>, With<Button>),
     >,
+    input: Res<Input<KeyCode>>,
 ) {
     for (interaction, mut color) in &mut interaction_query {
         match *interaction {
             Interaction::Clicked => {
-                state.set(GameState::Playing);
+                state.set(GameState::Prepare);
             }
             Interaction::Hovered => {
                 *color = button_colors.hovered.into();
@@ -86,6 +87,9 @@ fn click_play_button(
                 *color = button_colors.normal.into();
             }
         }
+    }
+    if input.just_pressed(KeyCode::Return) {
+        state.set(GameState::Prepare);
     }
 }
 
