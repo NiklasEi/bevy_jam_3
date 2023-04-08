@@ -11,7 +11,7 @@ pub const CHUNK_TILES: usize = 16;
 pub const TILE_SIZE: f32 = 32.;
 pub const CHUNK_WIDTH: f32 = CHUNK_TILES as f32 * TILE_SIZE;
 pub const TUTORIAL_CHUNKS: usize = 5;
-pub const MAP_GEN_DOUBLE_HOLES_FROM_CHUNK: usize = 12;
+pub const MAP_GEN_TRIPPLE_HOLES_FROM_CHUNK: usize = 12;
 pub const MAP_GEN_FOOD_ON_GROUND: f32 = 0.05;
 
 pub struct MapPlugin;
@@ -19,6 +19,7 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CurrentChunk>()
+            .init_resource::<Holes>()
             .add_system(setup_map.in_schedule(OnEnter(GameState::Playing)))
             .add_system(
                 spawn_chunk_system
@@ -85,7 +86,15 @@ fn spawn_tile(commands: &mut Commands, size: Vec2, position: Vec2, texture: Hand
 #[derive(Default, Resource)]
 pub struct CurrentChunk(pub(crate) usize);
 
-fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) {
+#[derive(Default, Resource)]
+struct Holes(usize);
+
+fn spawn_chunk(
+    commands: &mut Commands,
+    textures: &TextureAssets,
+    index: usize,
+    mut holes: &mut Holes,
+) {
     if index < TUTORIAL_CHUNKS {
         return;
     }
@@ -94,13 +103,16 @@ fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) 
     let hole1 = random.gen_range(0..CHUNK_TILES);
     let hole2 = random.gen_range(0..CHUNK_TILES);
     for tile in 0..CHUNK_TILES {
-        // todo: prevent holes with more than 4 tiles
-        if tile == hole1
-            || tile == hole2
-            || (index > MAP_GEN_DOUBLE_HOLES_FROM_CHUNK && (tile == hole1 + 1 || tile == hole2 + 1))
+        if holes.0 < 5
+            && (tile == hole1 + 1
+                || tile == hole2 + 1
+                || (index > MAP_GEN_TRIPPLE_HOLES_FROM_CHUNK
+                    && (tile == hole1 + 2 || tile == hole2 + 2)))
         {
+            holes.0 += 1;
             continue;
         }
+        holes.0 = 0;
         let center = Vec2::new(
             index as f32 * CHUNK_WIDTH + TILE_SIZE / 2. + tile as f32 * TILE_SIZE,
             PLATFORM_HEIGHT / 2.,
@@ -117,10 +129,11 @@ fn spawn_chunk_system(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     current_chunk: Res<CurrentChunk>,
+    mut holes: ResMut<Holes>,
 ) {
     if !current_chunk.is_changed() {
         return;
     }
 
-    spawn_chunk(&mut commands, &textures, current_chunk.0 + 2);
+    spawn_chunk(&mut commands, &textures, current_chunk.0 + 2, &mut holes);
 }

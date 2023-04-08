@@ -124,11 +124,16 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
         .spawn(SpriteSheetBundle {
             texture_atlas: textures.pig.clone(),
             sprite: TextureAtlasSprite::new(0),
-            transform: Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z)),
+            transform: {
+                let mut transform =
+                    Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z));
+                transform.scale = Vec3::splat(2.);
+                transform
+            },
             ..Default::default()
         })
         .insert(Player {
-            size: Vec2::new(30., 23.),
+            size: Vec2::new(60., 46.),
         })
         .insert(Velocity(Vec2::ZERO))
         .insert(AnimationTimer(
