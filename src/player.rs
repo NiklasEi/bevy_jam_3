@@ -14,6 +14,12 @@ pub struct Player {
     pub(crate) size: Vec2,
 }
 
+#[derive(Resource)]
+pub struct TakeInputs(pub(crate) bool);
+
+#[derive(Resource)]
+pub struct Falling(pub(crate) bool);
+
 #[derive(Component)]
 #[component(storage = "SparseSet")]
 pub struct Grounded;
@@ -61,6 +67,8 @@ impl Plugin for PlayerPlugin {
         app.init_resource::<Hunger>()
             .init_resource::<PlayerControls>()
             .init_resource::<HungerPerSecond>()
+            .insert_resource(TakeInputs(true))
+            .insert_resource(Falling(false))
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Playing)))
             .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities))
             .add_systems(
@@ -106,11 +114,11 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             ..Default::default()
         })
         .insert(Player {
-            size: Vec2::new(30., 15.),
+            size: Vec2::new(30., 23.),
         })
         .insert(Velocity(Vec2::ZERO))
         .insert(AnimationTimer(
-            Timer::from_seconds(0.1, TimerMode::Repeating),
+            Timer::from_seconds(0.15, TimerMode::Repeating),
             4,
         ));
 }
