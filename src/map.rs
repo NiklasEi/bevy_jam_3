@@ -5,7 +5,7 @@ use crate::GameState;
 pub use bevy::prelude::*;
 use rand::Rng;
 
-pub const PLATFORM_Z: f32 = 0.;
+pub const PLATFORM_Z: f32 = 8.;
 pub const PLATFORM_HEIGHT: f32 = TILE_SIZE;
 pub const CHUNK_TILES: usize = 16;
 pub const TILE_SIZE: f32 = 32.;
@@ -94,6 +94,7 @@ fn spawn_chunk(commands: &mut Commands, textures: &TextureAssets, index: usize) 
     let hole1 = random.gen_range(0..CHUNK_TILES);
     let hole2 = random.gen_range(0..CHUNK_TILES);
     for tile in 0..CHUNK_TILES {
+        // todo: prevent holes with more than 4 tiles
         if tile == hole1
             || tile == hole2
             || (index > MAP_GEN_DOUBLE_HOLES_FROM_CHUNK && (tile == hole1 + 1 || tile == hole2 + 1))

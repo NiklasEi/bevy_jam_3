@@ -2,6 +2,7 @@ use crate::camera::GameCamera;
 use crate::loading::FontAssets;
 use crate::{GameState, HEIGHT, WIDTH};
 use bevy::prelude::*;
+use bevy_parallax::ParallaxCameraComponent;
 
 pub struct MenuPlugin;
 
@@ -41,7 +42,8 @@ fn setup_menu(
             transform: Transform::from_translation(Vec3::new(WIDTH / 2., HEIGHT / 2., 999.9)),
             ..default()
         })
-        .insert(GameCamera);
+        .insert(GameCamera)
+        .insert(ParallaxCameraComponent);
     commands
         .spawn(ButtonBundle {
             style: Style {

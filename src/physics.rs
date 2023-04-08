@@ -16,6 +16,7 @@ impl Plugin for PhysicsPlugin {
                 .before(PhysicsSystems::Move),
         )
         .configure_set(PhysicsSystems::Move.run_if(in_state(GameState::Playing)))
+        .configure_set(PhysicsSystems::Move.run_if(in_state(GameState::Playing)))
         .add_system(gravity.in_set(PhysicsSystems::CalculateVelocities))
         .add_system(move_player.in_set(PhysicsSystems::Move));
     }

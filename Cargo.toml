@@ -38,6 +38,7 @@ bevy_editor_pls = "0.4.0"
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.28", default-features = false }
 image = { version = "0.24", default-features = false }
+bevy-parallax = { git = "https://github.com/NiklasEi/bevy-parallax", branch = "export_system_set" }
 
 [build-dependencies]
 embed-resource = "1.4"

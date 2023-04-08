@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use rand::prelude::*;
 
 pub const FOOD_SIZE: f32 = 16.;
-pub const FOOD_Z: f32 = 2.;
+pub const FOOD_Z: f32 = 9.;
 
 pub struct FoodPlugin;
 

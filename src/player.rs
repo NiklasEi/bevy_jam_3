@@ -5,7 +5,7 @@ use crate::physics::{PhysicsSystems, Velocity};
 use crate::{GameState, HEIGHT, WIDTH};
 use bevy::prelude::*;
 
-pub const PLAYER_Z: f32 = 5.;
+pub const PLAYER_Z: f32 = 10.;
 
 pub struct PlayerPlugin;
 
@@ -42,7 +42,7 @@ pub struct HungerPerSecond(f32);
 
 impl Default for HungerPerSecond {
     fn default() -> Self {
-        HungerPerSecond(10.)
+        HungerPerSecond(1.)
     }
 }
 
