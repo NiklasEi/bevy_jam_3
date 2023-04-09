@@ -84,9 +84,12 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-fn lose_on_falling(player: Query<&Transform, With<Player>>) {
-    if player.single().translation.y < TILE_SIZE {
-        println!("Fell!");
+fn lose_on_falling(
+    player: Query<&Transform, With<Player>>,
+    mut state: ResMut<NextState<GameState>>,
+) {
+    if player.single().translation.y < 0. {
+        state.set(GameState::Restart);
     }
 }
 
