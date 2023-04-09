@@ -19,25 +19,25 @@ impl Plugin for CameraPlugin {
             )
             .insert_resource(ParallaxResource {
                 layer_data: vec![
-                    // LayerData {
-                    //     speed: LayerSpeed::Horizontal(0.9),
-                    //     path: "textures/back.png".to_string(),
-                    //     tile_size: Vec2::new(800.0, 600.0),
-                    //     position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
-                    //     z: 1.0,
-                    //     ..Default::default()
-                    // },
-                    // LayerData {
-                    //     speed: LayerSpeed::Horizontal(0.5),
-                    //     path: "textures/middle.png".to_string(),
-                    //     tile_size: Vec2::new(800.0, 600.0),
-                    //     position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
-                    //     z: 2.0,
-                    //     ..Default::default()
-                    // },
+                    LayerData {
+                        speed: LayerSpeed::Horizontal(0.9),
+                        path: "textures/back.png".to_string(),
+                        tile_size: Vec2::new(1024.0, 600.0),
+                        position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
+                        z: 1.0,
+                        ..Default::default()
+                    },
+                    LayerData {
+                        speed: LayerSpeed::Horizontal(0.5),
+                        path: "textures/middle.png".to_string(),
+                        tile_size: Vec2::new(1024.0, 600.0),
+                        position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
+                        z: 2.0,
+                        ..Default::default()
+                    },
                     LayerData {
                         speed: LayerSpeed::Horizontal(0.1),
-                        path: "textures/background.png".to_string(),
+                        path: "textures/front.png".to_string(),
                         tile_size: Vec2::new(1024.0, 600.0),
                         position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
                         z: 3.0,

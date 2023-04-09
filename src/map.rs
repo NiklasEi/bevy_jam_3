@@ -104,8 +104,10 @@ fn spawn_chunk(
     let hole2 = random.gen_range(0..CHUNK_TILES);
     for tile in 0..CHUNK_TILES {
         if holes.0 < 5
-            && (tile == hole1 + 1
-                || tile == hole2 + 1
+            && (tile == hole1
+                || tile == hole1 + 1
+                || tile == hole1
+                || tile == hole1 + 1
                 || (index > MAP_GEN_TRIPPLE_HOLES_FROM_CHUNK
                     && (tile == hole1 + 2 || tile == hole2 + 2)))
         {
