@@ -15,7 +15,7 @@ impl Plugin for UiPlugin {
 }
 
 #[derive(Resource, Default)]
-pub struct Score(f32);
+pub struct Score(pub(crate) f32);
 
 #[derive(Component)]
 struct ScoreText;

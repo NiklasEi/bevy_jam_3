@@ -28,7 +28,7 @@ impl Plugin for CameraPlugin {
                         ..Default::default()
                     },
                     LayerData {
-                        speed: LayerSpeed::Horizontal(0.5),
+                        speed: LayerSpeed::Horizontal(0.7),
                         path: "textures/middle.png".to_string(),
                         tile_size: Vec2::new(1024.0, 600.0),
                         position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
@@ -36,11 +36,19 @@ impl Plugin for CameraPlugin {
                         ..Default::default()
                     },
                     LayerData {
-                        speed: LayerSpeed::Horizontal(0.1),
+                        speed: LayerSpeed::Horizontal(0.4),
                         path: "textures/front.png".to_string(),
                         tile_size: Vec2::new(1024.0, 600.0),
                         position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
                         z: 3.0,
+                        ..Default::default()
+                    },
+                    LayerData {
+                        speed: LayerSpeed::Horizontal(0.1),
+                        path: "textures/very_front.png".to_string(),
+                        tile_size: Vec2::new(1024.0, 600.0),
+                        position: Vec2::new(WIDTH / 2., HEIGHT / 2.),
+                        z: 4.0,
                         ..Default::default()
                     },
                 ],
@@ -67,9 +75,9 @@ fn follow_player(
         } else {
             delta + THRESHOLD
         };
-        // if camera_transform.translation.x + move_by < WIDTH / 2. {
-        //     move_by = camera_transform.translation.x - (WIDTH / 2.);
-        // }
+        if camera_transform.translation.x + move_by < WIDTH / 2. {
+            move_by = (WIDTH / 2.) - camera_transform.translation.x;
+        }
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(move_by, 0.0),
         });

@@ -133,7 +133,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             ..Default::default()
         })
         .insert(Player {
-            size: Vec2::new(60., 46.),
+            size: Vec2::new(56., 44.),
         })
         .insert(Velocity(Vec2::ZERO))
         .insert(AnimationTimer(
