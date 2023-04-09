@@ -1,10 +1,10 @@
 use crate::map::{Collider, CurrentChunk, Solid, CHUNK_WIDTH};
-use crate::player::{Grounded, Player, PlayerControls};
+use crate::player::{Grounded, Player};
 use crate::GameState;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
-const GRAVITY: f32 = 13.;
+const GRAVITY: f32 = 4250.;
 
 pub struct PhysicsPlugin;
 
@@ -40,7 +40,6 @@ fn gravity(time: Res<Time>, mut falling: Query<&mut Velocity, (With<Player>, Wit
 fn move_player(
     mut commands: Commands,
     time: Res<Time>,
-    player_controls: Res<PlayerControls>,
     mut player: Query<(Entity, &mut Transform, &mut Velocity, &Player)>,
     colliders: Query<(&Transform, &Collider), (Without<Player>, With<Solid>)>,
     mut current_chunk: ResMut<CurrentChunk>,
@@ -53,8 +52,7 @@ fn move_player(
     info!("Checking player collisions");
     let mut grounded = false;
 
-    let mut movement_y =
-        Vec3::new(0., player_velocity.0.y, 0.) * time.delta_seconds() * player_controls.speed;
+    let mut movement_y = Vec3::new(0., player_velocity.0.y, 0.) * time.delta_seconds();
     let mut potential_new_position_y = player_transform.translation + movement_y;
     let mut new_rect_y = Rect::from_center_size(potential_new_position_y.xy(), player.size);
     for (collider_transform, collider) in &colliders {
@@ -81,8 +79,7 @@ fn move_player(
         }
     }
 
-    let mut movement_x =
-        Vec3::new(player_velocity.0.x, 0., 0.) * time.delta_seconds() * player_controls.speed;
+    let mut movement_x = Vec3::new(player_velocity.0.x, 0., 0.) * time.delta_seconds();
     let mut potential_new_position_x = potential_new_position_y + movement_x;
     let mut new_rect_x = Rect::from_center_size(potential_new_position_x.xy(), player.size);
     for (collider_transform, collider) in &colliders {

@@ -56,7 +56,7 @@ pub struct PlayerControls {
 impl Default for PlayerControls {
     fn default() -> Self {
         PlayerControls {
-            jump_power: 3.5,
+            jump_power: 1100.,
             speed: 250.,
         }
     }
@@ -152,7 +152,7 @@ fn apply_actions(
     can_jump: Query<&Grounded, With<Player>>,
 ) {
     let (player, mut velocity, mut sprite) = player_query.single_mut();
-    velocity.0.x = actions.player_movement;
+    velocity.0.x = actions.player_movement * player_controls.speed;
     if velocity.0.x.abs() > 0. {
         sprite.flip_x = velocity.0.x < 0.;
     }

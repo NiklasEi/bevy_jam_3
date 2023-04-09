@@ -3,6 +3,7 @@
 mod actions;
 mod audio;
 mod camera;
+mod effects;
 mod food;
 mod loading;
 mod map;
@@ -19,6 +20,7 @@ use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
 
 use crate::camera::CameraPlugin;
+use crate::effects::EffectPlugin;
 use crate::food::FoodPlugin;
 use crate::map::MapPlugin;
 use crate::physics::PhysicsPlugin;
@@ -59,7 +61,8 @@ impl Plugin for GamePlugin {
             .add_plugin(CameraPlugin)
             .add_plugin(UiPlugin)
             .add_plugin(FoodPlugin)
-            .add_plugin(ResetPlugin);
+            .add_plugin(ResetPlugin)
+            .add_plugin(EffectPlugin);
 
         #[cfg(debug_assertions)]
         {

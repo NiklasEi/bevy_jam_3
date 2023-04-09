@@ -1,3 +1,4 @@
+use crate::effects::StartEffect;
 use crate::loading::{AudioAssets, TextureAssets};
 use crate::map::{Collider, Level, TILE_SIZE};
 use crate::physics::PhysicsSystems;
@@ -40,6 +41,7 @@ fn eat(
         if !food_rect.intersect(player_rect).is_empty() {
             hunger.0 += food_value.value;
             audio.play(audio_assets.eating.clone());
+            commands.add(StartEffect(random()));
             hunger.0 = hunger.0.clamp(0., 100.);
             commands.entity(food).despawn();
         }
