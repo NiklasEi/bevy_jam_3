@@ -60,6 +60,9 @@ fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
     spawn_tutorial_chunks(&mut commands, &textures);
 }
 
+#[derive(Component)]
+pub struct Level;
+
 fn spawn_tutorial_chunks(commands: &mut Commands, textures: &TextureAssets) {
     for index in 0..TUTORIAL_CHUNKS {
         for tile in 0..CHUNK_TILES {
@@ -81,7 +84,8 @@ fn spawn_tile(commands: &mut Commands, size: Vec2, position: Vec2, texture: Hand
             ..default()
         })
         .insert(Collider { size })
-        .insert(Solid);
+        .insert(Solid)
+        .insert(Level);
 }
 
 #[derive(Default, Resource)]

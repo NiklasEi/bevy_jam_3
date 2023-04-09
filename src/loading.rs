@@ -4,6 +4,8 @@ use bevy::render::render_resource::{AddressMode, SamplerDescriptor};
 use bevy::render::texture::ImageSampler;
 use bevy_asset_loader::prelude::*;
 use bevy_kira_audio::AudioSource;
+use rand::rngs::ThreadRng;
+use rand::Rng;
 
 pub struct LoadingPlugin;
 
@@ -37,8 +39,24 @@ pub struct FontAssets {
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
-    #[asset(path = "audio/flying.ogg")]
-    pub flying: Handle<AudioSource>,
+    #[asset(path = "audio/eating.ogg")]
+    pub eating: Handle<AudioSource>,
+    #[asset(path = "audio/pig1.ogg")]
+    pub pig1: Handle<AudioSource>,
+    #[asset(path = "audio/pig2.ogg")]
+    pub pig2: Handle<AudioSource>,
+    #[asset(path = "audio/pig3.ogg")]
+    pub pig3: Handle<AudioSource>,
+}
+
+impl AudioAssets {
+    pub(crate) fn random_grunt(&self, random: &mut ThreadRng) -> Handle<AudioSource> {
+        match random.gen_range(0..3) {
+            0 => self.pig1.clone(),
+            1 => self.pig2.clone(),
+            _ => self.pig3.clone(),
+        }
+    }
 }
 
 #[derive(AssetCollection, Resource)]

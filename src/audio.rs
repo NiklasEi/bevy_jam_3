@@ -1,55 +1,36 @@
-use crate::actions::{set_movement_actions, Actions};
 use crate::loading::AudioAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
+use rand::{thread_rng, Rng};
 
 pub struct InternalAudioPlugin;
 
 // This plugin is responsible to control the game audio
 impl Plugin for InternalAudioPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(AudioPlugin)
-            .add_system(start_audio.in_schedule(OnEnter(GameState::Playing)))
-            .add_system(
-                control_flying_sound
-                    .after(set_movement_actions)
-                    .in_set(OnUpdate(GameState::Playing)),
-            );
+        app.init_resource::<LastGrunt>()
+            .add_plugin(AudioPlugin)
+            .add_system(random_grunting.in_set(OnUpdate(GameState::Playing)));
     }
 }
 
-#[derive(Resource)]
-struct FlyingAudio(Handle<AudioInstance>);
+#[derive(Resource, Default)]
+struct LastGrunt(f32);
 
-fn start_audio(mut commands: Commands, audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
-    audio.pause();
-    let handle = audio
-        .play(audio_assets.flying.clone())
-        .looped()
-        .with_volume(0.3)
-        .handle();
-    commands.insert_resource(FlyingAudio(handle));
-}
-
-fn control_flying_sound(
-    actions: Res<Actions>,
-    audio: Res<FlyingAudio>,
-    mut audio_instances: ResMut<Assets<AudioInstance>>,
+fn random_grunting(
+    time: Res<Time>,
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
+    mut last_grunt: ResMut<LastGrunt>,
 ) {
-    if let Some(instance) = audio_instances.get_mut(&audio.0) {
-        match instance.state() {
-            PlaybackState::Paused { .. } => {
-                if actions.player_movement.abs() > 0. {
-                    instance.resume(AudioTween::default());
-                }
-            }
-            PlaybackState::Playing { .. } => {
-                if actions.player_movement.abs() < 0.1 {
-                    instance.pause(AudioTween::default());
-                }
-            }
-            _ => {}
-        }
+    let mut random = thread_rng();
+    if time.elapsed_seconds() - last_grunt.0 > 1.5
+        && random.gen::<f32>() < 0.1 * time.delta_seconds()
+    {
+        last_grunt.0 = time.elapsed_seconds();
+        audio
+            .play(audio_assets.random_grunt(&mut random))
+            .with_volume(0.1);
     }
 }

@@ -1,11 +1,12 @@
-use crate::loading::TextureAssets;
-use crate::map::{Collider, TILE_SIZE};
+use crate::loading::{AudioAssets, TextureAssets};
+use crate::map::{Collider, Level, TILE_SIZE};
 use crate::physics::PhysicsSystems;
 use crate::player::{Hunger, Player};
 use crate::ui::Score;
 use crate::GameState;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioControl};
 use rand::prelude::*;
 
 pub const FOOD_SIZE: f32 = 16.;
@@ -28,6 +29,8 @@ fn eat(
     player: Query<(&Transform, &Player)>,
     food: Query<(Entity, &Transform, &Collider, &Food), Without<Player>>,
     mut hunger: ResMut<Hunger>,
+    audio_assets: Res<AudioAssets>,
+    audio: Res<Audio>,
 ) {
     let (player_transform, player_collider) = player.single();
     let player_rect =
@@ -36,6 +39,7 @@ fn eat(
         let food_rect = Rect::from_center_size(food_transform.translation.xy(), food_collider.size);
         if !food_rect.intersect(player_rect).is_empty() {
             hunger.0 += food_value.value;
+            audio.play(audio_assets.eating.clone());
             hunger.0 = hunger.0.clamp(0., 100.);
             commands.entity(food).despawn();
         }
@@ -94,7 +98,8 @@ pub fn spawn_random_food(
         .insert(Collider {
             size: Vec2::splat(16.),
         })
-        .insert(Food { value: 5. });
+        .insert(Food { value: 5. })
+        .insert(Level);
 }
 
 pub fn spawn_truffle(textures: &TextureAssets, commands: &mut Commands, tile: Vec2) {
@@ -111,5 +116,6 @@ pub fn spawn_truffle(textures: &TextureAssets, commands: &mut Commands, tile: Ve
         .insert(Collider {
             size: Vec2::splat(16.),
         })
-        .insert(Truffle { value: 10. });
+        .insert(Truffle { value: 10. })
+        .insert(Level);
 }

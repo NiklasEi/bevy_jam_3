@@ -1,4 +1,5 @@
 use crate::loading::FontAssets;
+use crate::map::{CurrentChunk, Level};
 use crate::menu::ButtonColors;
 use crate::physics::Velocity;
 use crate::player::{Grounded, Hunger, Player, PLAYER_Z};
@@ -11,7 +12,13 @@ pub struct ResetPlugin;
 impl Plugin for ResetPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            (reset_player, cleanup_restart, reset_hunger, reset_score)
+            (
+                reset_player,
+                cleanup_restart,
+                reset_hunger,
+                reset_score,
+                reset_map,
+            )
                 .in_schedule(OnExit(GameState::Restart)),
         )
         .add_system(setup_restart.in_schedule(OnEnter(GameState::Restart)))
@@ -27,6 +34,17 @@ fn reset_player(
     commands.entity(entity).remove::<Grounded>();
     transform.translation = Vec3::new(WIDTH / 2., HEIGHT / 2., PLAYER_Z);
     velocity.0 = Vec2::ZERO;
+}
+
+fn reset_map(
+    level: Query<Entity, With<Level>>,
+    mut commands: Commands,
+    mut current_chunk: ResMut<CurrentChunk>,
+) {
+    for entity in &level {
+        commands.entity(entity).despawn();
+    }
+    current_chunk.0 = 0;
 }
 
 fn reset_hunger(mut hunger: ResMut<Hunger>) {

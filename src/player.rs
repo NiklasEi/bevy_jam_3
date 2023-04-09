@@ -88,7 +88,7 @@ fn lose_on_falling(
     player: Query<&Transform, With<Player>>,
     mut state: ResMut<NextState<GameState>>,
 ) {
-    if player.single().translation.y < 0. {
+    if player.single().translation.y < -2. * TILE_SIZE {
         state.set(GameState::Restart);
     }
 }
