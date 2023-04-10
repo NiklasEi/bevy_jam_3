@@ -65,10 +65,8 @@ pub struct TextureAssets {
     pub pig: Handle<TextureAtlas>,
     #[asset(path = "textures/ground.png")]
     pub ground: Handle<Image>,
-    #[asset(path = "textures/platform.png")]
+    #[asset(path = "textures/ground.png")]
     pub platform: Handle<Image>,
-    #[asset(path = "textures/wall.png")]
-    pub wall: Handle<Image>,
     #[asset(path = "textures/truffle.png")]
     pub truffle: Handle<Image>,
     #[asset(
@@ -95,7 +93,4 @@ fn configure_samplers(texture_assets: Res<TextureAssets>, mut textures: ResMut<A
 
     let mut platform = textures.get_mut(&texture_assets.platform).unwrap();
     platform.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor.clone());
-
-    let mut wall = textures.get_mut(&texture_assets.wall).unwrap();
-    wall.sampler_descriptor = ImageSampler::Descriptor(repeat_descriptor);
 }

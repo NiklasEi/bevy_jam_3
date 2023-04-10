@@ -1,7 +1,7 @@
 use crate::food::{spawn_random_food, spawn_truffle};
 use crate::loading::TextureAssets;
 use crate::physics::PhysicsSystems;
-use crate::GameState;
+use crate::{GameState, HEIGHT};
 pub use bevy::prelude::*;
 use rand::Rng;
 
@@ -44,19 +44,19 @@ fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
         let size = Vec2::new(TILE_SIZE, TILE_SIZE);
         spawn_tile(&mut commands, size, center, textures.platform.clone());
     }
-
-    for brick in 1..20 {
-        let center_start_wall =
-            Vec2::new(TILE_SIZE / 2., TILE_SIZE / 2. + brick as f32 * TILE_SIZE);
-        let size_start_wall = Vec2::new(TILE_SIZE, TILE_SIZE);
-
-        spawn_tile(
-            &mut commands,
-            size_start_wall,
-            center_start_wall,
-            textures.wall.clone(),
-        );
-    }
+    let wall = Vec2::new(TILE_SIZE, HEIGHT);
+    commands
+        .spawn(SpatialBundle {
+            transform: Transform::from_translation(Vec3::new(
+                -TILE_SIZE / 2.,
+                HEIGHT / 2.,
+                PLATFORM_Z,
+            )),
+            ..default()
+        })
+        .insert(Collider { size: wall })
+        .insert(Solid)
+        .insert(Level);
     spawn_tutorial_chunks(&mut commands, &textures);
 }
 
