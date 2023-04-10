@@ -1,7 +1,7 @@
 use crate::actions::Actions;
 use crate::loading::TextureAssets;
-use crate::map::TILE_SIZE;
-use crate::physics::{PhysicsSystems, Velocity};
+use crate::map::{Collider, TILE_SIZE};
+use crate::physics::{Move, PhysicsSystems, Velocity};
 use crate::{GameState, HEIGHT, WIDTH};
 use bevy::prelude::*;
 
@@ -10,9 +10,7 @@ pub const PLAYER_Z: f32 = 10.;
 pub struct PlayerPlugin;
 
 #[derive(Component)]
-pub struct Player {
-    pub(crate) size: Vec2,
-}
+pub struct Player;
 
 #[derive(Resource, Reflect, Default)]
 #[reflect(Resource)]
@@ -42,7 +40,7 @@ pub struct HungerPerSecond(f32);
 
 impl Default for HungerPerSecond {
     fn default() -> Self {
-        HungerPerSecond(1.)
+        HungerPerSecond(1.5)
     }
 }
 
@@ -135,9 +133,11 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             },
             ..Default::default()
         })
-        .insert(Player {
+        .insert(Collider {
             size: Vec2::new(56., 44.),
         })
+        .insert(Player)
+        .insert(Move)
         .insert(Velocity(Vec2::ZERO))
         .insert(AnimationTimer(
             Timer::from_seconds(0.15, TimerMode::Repeating),

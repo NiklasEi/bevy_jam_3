@@ -3,7 +3,7 @@ use crate::loading::TextureAssets;
 use crate::physics::PhysicsSystems;
 use crate::{GameState, HEIGHT};
 pub use bevy::prelude::*;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 
 pub const PLATFORM_Z: f32 = 8.;
 pub const PLATFORM_HEIGHT: f32 = TILE_SIZE;
@@ -12,7 +12,7 @@ pub const TILE_SIZE: f32 = 32.;
 pub const CHUNK_WIDTH: f32 = CHUNK_TILES as f32 * TILE_SIZE;
 pub const TUTORIAL_CHUNKS: usize = 5;
 pub const MAP_GEN_TRIPPLE_HOLES_FROM_CHUNK: usize = 12;
-pub const MAP_GEN_FOOD_ON_GROUND: f32 = 0.02;
+pub const MAP_GEN_FOOD_ON_GROUND: f32 = 0.03;
 pub const MAP_GEN_FOOD_ON_PLATFORM: f32 = 0.05;
 
 pub struct MapPlugin;
@@ -160,7 +160,7 @@ fn spawn_chunk(
                 center + Vec2::new(TILE_SIZE, 8. * TILE_SIZE),
             );
         }
-        if holes.0 < 5
+        if holes.0 < 4
             && (tile == hole1
                 || tile == hole1 + 1
                 || tile == hole2

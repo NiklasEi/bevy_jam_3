@@ -27,7 +27,7 @@ impl Plugin for FoodPlugin {
 
 fn eat(
     mut commands: Commands,
-    player: Query<(&Transform, &Player)>,
+    player: Query<(&Transform, &Collider), With<Player>>,
     food: Query<(Entity, &Transform, &Collider, &Food), Without<Player>>,
     mut hunger: ResMut<Hunger>,
     audio_assets: Res<AudioAssets>,
@@ -40,7 +40,7 @@ fn eat(
         let food_rect = Rect::from_center_size(food_transform.translation.xy(), food_collider.size);
         if !food_rect.intersect(player_rect).is_empty() {
             hunger.0 += food_value.value;
-            audio.play(audio_assets.eating.clone());
+            audio.play(audio_assets.eating.clone()).with_volume(0.05);
             commands.add(StartEffect(random()));
             hunger.0 = hunger.0.clamp(0., 100.);
             commands.entity(food).despawn();
@@ -50,7 +50,7 @@ fn eat(
 
 fn collect(
     mut commands: Commands,
-    player: Query<(&Transform, &Player)>,
+    player: Query<(&Transform, &Collider), With<Player>>,
     food: Query<(Entity, &Transform, &Collider, &Truffle), Without<Player>>,
     mut hunger: ResMut<Hunger>,
     mut score: ResMut<Score>,
@@ -100,7 +100,7 @@ pub fn spawn_random_food(
         .insert(Collider {
             size: Vec2::splat(16.),
         })
-        .insert(Food { value: 5. })
+        .insert(Food { value: 3. })
         .insert(Level);
 }
 
@@ -118,6 +118,6 @@ pub fn spawn_truffle(textures: &TextureAssets, commands: &mut Commands, tile: Ve
         .insert(Collider {
             size: Vec2::splat(16.),
         })
-        .insert(Truffle { value: 10. })
+        .insert(Truffle { value: 5. })
         .insert(Level);
 }

@@ -11,8 +11,17 @@ impl Plugin for InternalAudioPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<LastGrunt>()
             .add_plugin(AudioPlugin)
+            .add_audio_channel::<Background>()
+            .add_system(start_background.in_schedule(OnEnter(GameState::Menu)))
             .add_system(random_grunting.in_set(OnUpdate(GameState::Playing)));
     }
+}
+
+#[derive(Resource)]
+struct Background;
+
+fn start_background(audio: Res<AudioChannel<Background>>, audio_assets: Res<AudioAssets>) {
+    audio.play(audio_assets.birds.clone()).looped();
 }
 
 #[derive(Resource, Default)]
@@ -31,6 +40,6 @@ fn random_grunting(
         last_grunt.0 = time.elapsed_seconds();
         audio
             .play(audio_assets.random_grunt(&mut random))
-            .with_volume(0.1);
+            .with_volume(0.05);
     }
 }

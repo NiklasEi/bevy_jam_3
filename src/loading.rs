@@ -39,6 +39,8 @@ pub struct FontAssets {
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
+    #[asset(path = "audio/birds.ogg")]
+    pub birds: Handle<AudioSource>,
     #[asset(path = "audio/eating.ogg")]
     pub eating: Handle<AudioSource>,
     #[asset(path = "audio/pig1.ogg")]
@@ -65,6 +67,8 @@ pub struct TextureAssets {
     pub pig: Handle<TextureAtlas>,
     #[asset(path = "textures/ground.png")]
     pub ground: Handle<Image>,
+    #[asset(path = "textures/bird.png")]
+    pub bird: Handle<Image>,
     #[asset(path = "textures/ground.png")]
     pub platform: Handle<Image>,
     #[asset(path = "textures/truffle.png")]
