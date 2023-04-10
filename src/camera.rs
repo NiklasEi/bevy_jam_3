@@ -1,3 +1,4 @@
+use crate::map::{MovingControls, CHUNK_WIDTH};
 use crate::physics::PhysicsSystems;
 use crate::player::Player;
 use crate::{GameState, HEIGHT, WIDTH};
@@ -66,6 +67,11 @@ fn follow_player(
     player: Query<&Transform, With<Player>>,
     camera: Query<&Transform, (With<GameCamera>, Without<Player>)>,
     mut move_event_writer: EventWriter<ParallaxMoveEvent>,
+    mut commands: Commands,
+    mut controls: Query<
+        (Entity, &mut Transform),
+        (With<MovingControls>, Without<Player>, Without<GameCamera>),
+    >,
 ) {
     let camera_transform = camera.single();
     let delta = player.single().translation.x - camera_transform.translation.x;
@@ -81,5 +87,11 @@ fn follow_player(
         move_event_writer.send(ParallaxMoveEvent {
             camera_move_speed: Vec2::new(move_by, 0.0),
         });
+        for (control, mut control_transform) in &mut controls {
+            control_transform.translation.x += move_by;
+            if control_transform.translation.x > 4. * CHUNK_WIDTH {
+                commands.entity(control).despawn();
+            }
+        }
     }
 }

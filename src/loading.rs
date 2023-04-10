@@ -73,6 +73,18 @@ pub struct TextureAssets {
     pub platform: Handle<Image>,
     #[asset(path = "textures/truffle.png")]
     pub truffle: Handle<Image>,
+    #[asset(path = "textures/control_walk.png")]
+    pub control_walk: Handle<Image>,
+    #[asset(path = "textures/control_jump.png")]
+    pub control_jump: Handle<Image>,
+    #[asset(path = "textures/control_truffle.png")]
+    pub control_truffle: Handle<Image>,
+    #[asset(path = "textures/control_truffles.png")]
+    pub control_truffles: Handle<Image>,
+    #[asset(path = "textures/control_food.png")]
+    pub control_food: Handle<Image>,
+    #[asset(path = "textures/control_hunger.png")]
+    pub control_hunger: Handle<Image>,
     #[asset(
         collection(typed),
         paths(

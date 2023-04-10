@@ -1,8 +1,10 @@
 use crate::actions::Actions;
+use crate::effects::Bird;
 use crate::loading::TextureAssets;
 use crate::map::{Collider, TILE_SIZE};
 use crate::physics::{Move, PhysicsSystems, Velocity};
 use crate::{GameState, HEIGHT, WIDTH};
+use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
 pub const PLAYER_Z: f32 = 10.;
@@ -75,10 +77,18 @@ impl Plugin for PlayerPlugin {
             .add_system(spawn_player.in_schedule(OnEnter(GameState::Prepare)))
             .add_system(apply_actions.in_set(PhysicsSystems::CalculateVelocities))
             .add_systems(
-                (lose_on_falling.after(PhysicsSystems::Move), process_food)
+                (
+                    lose_on_falling.after(PhysicsSystems::Move),
+                    process_food,
+                    bird_kill.after(PhysicsSystems::Move),
+                )
                     .in_set(OnUpdate(GameState::Playing)),
             )
-            .add_system(animate_player.after(apply_actions));
+            .add_system(
+                animate_player
+                    .after(apply_actions)
+                    .before(PhysicsSystems::Move),
+            );
     }
 }
 
@@ -158,5 +168,21 @@ fn apply_actions(
     }
     if actions.attempt_jump && can_jump.contains(player) {
         velocity.0.y = player_controls.jump_power;
+    }
+}
+
+fn bird_kill(
+    bird: Query<(&Transform, &Collider), (With<Bird>, Without<Player>)>,
+    player: Query<(&Transform, &Collider), (With<Player>, Without<Bird>)>,
+    mut state: ResMut<NextState<GameState>>,
+) {
+    let (player_transform, player_collider) = player.single();
+    let player_rec =
+        Rect::from_center_size(player_transform.translation.xy(), player_collider.size);
+    for (bird_transform, bird_collider) in &bird {
+        let bird_rec = Rect::from_center_size(bird_transform.translation.xy(), bird_collider.size);
+        if !bird_rec.intersect(player_rec).is_empty() {
+            state.set(GameState::Restart);
+        }
     }
 }

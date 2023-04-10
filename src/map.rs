@@ -1,9 +1,9 @@
 use crate::food::{spawn_random_food, spawn_truffle};
 use crate::loading::TextureAssets;
 use crate::physics::PhysicsSystems;
-use crate::{GameState, HEIGHT};
+use crate::{GameState, HEIGHT, WIDTH};
 pub use bevy::prelude::*;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 
 pub const PLATFORM_Z: f32 = 8.;
 pub const PLATFORM_HEIGHT: f32 = TILE_SIZE;
@@ -39,11 +39,17 @@ pub struct Collider {
 pub struct Solid;
 
 fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
-    for brick in -1..=1 {
-        let center = Vec2::new((8 + brick) as f32 * TILE_SIZE, 4. * TILE_SIZE);
-        let size = Vec2::new(TILE_SIZE, TILE_SIZE);
-        spawn_tile(&mut commands, size, center, textures.platform.clone());
-    }
+    commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_translation(Vec3::new(
+                WIDTH / 2.,
+                TILE_SIZE + 60.,
+                PLATFORM_Z,
+            )),
+            texture: textures.control_walk.clone(),
+            ..default()
+        })
+        .insert(Level);
     let wall = Vec2::new(TILE_SIZE, HEIGHT);
     commands
         .spawn(SpatialBundle {
@@ -63,13 +69,95 @@ fn setup_map(mut commands: Commands, textures: Res<TextureAssets>) {
 #[derive(Component)]
 pub struct Level;
 
+#[derive(Component)]
+pub struct MovingControls;
+
 fn spawn_tutorial_chunks(commands: &mut Commands, textures: &TextureAssets) {
+    commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_translation(Vec3::new(200., HEIGHT - 150., PLATFORM_Z)),
+            texture: textures.control_truffles.clone(),
+            ..default()
+        })
+        .insert(Level)
+        .insert(MovingControls);
+    commands
+        .spawn(SpriteBundle {
+            transform: Transform::from_translation(Vec3::new(
+                WIDTH - 200.,
+                HEIGHT - 150.,
+                PLATFORM_Z,
+            )),
+            texture: textures.control_hunger.clone(),
+            ..default()
+        })
+        .insert(Level)
+        .insert(MovingControls);
+    for brick in -1..=1 {
+        let center = Vec2::new(
+            (3 * CHUNK_TILES as i32 + brick) as f32 * TILE_SIZE,
+            4. * TILE_SIZE,
+        );
+        let size = Vec2::new(TILE_SIZE, TILE_SIZE);
+        spawn_tile(commands, size, center, textures.platform.clone());
+
+        if brick == 0 {
+            commands
+                .spawn(SpriteBundle {
+                    transform: Transform::from_translation(Vec3::new(
+                        center.x,
+                        center.y + 110.,
+                        PLATFORM_Z,
+                    )),
+                    texture: textures.control_food.clone(),
+                    ..default()
+                })
+                .insert(Level);
+            spawn_random_food(&textures, commands, center, &mut thread_rng());
+        }
+    }
+    for brick in 4..=6 {
+        let center = Vec2::new((3 * CHUNK_TILES + brick) as f32 * TILE_SIZE, 8. * TILE_SIZE);
+        let size = Vec2::new(TILE_SIZE, TILE_SIZE);
+        spawn_tile(commands, size, center, textures.platform.clone());
+
+        if brick == 5 {
+            commands
+                .spawn(SpriteBundle {
+                    transform: Transform::from_translation(Vec3::new(
+                        center.x,
+                        center.y + 110.,
+                        PLATFORM_Z,
+                    )),
+                    texture: textures.control_truffle.clone(),
+                    ..default()
+                })
+                .insert(Level);
+            spawn_truffle(&textures, commands, center);
+        }
+    }
     for index in 0..TUTORIAL_CHUNKS {
         for tile in 0..CHUNK_TILES {
             let center = Vec2::new(
                 index as f32 * CHUNK_WIDTH + TILE_SIZE / 2. + tile as f32 * TILE_SIZE,
                 TILE_SIZE / 2.,
             );
+            if index == 1 && (tile == 10 || tile == 11 || tile == 12) {
+                if tile == 11 {
+                    commands
+                        .spawn(SpriteBundle {
+                            transform: Transform::from_translation(Vec3::new(
+                                center.x,
+                                TILE_SIZE + 90.,
+                                PLATFORM_Z,
+                            )),
+                            texture: textures.control_jump.clone(),
+                            ..default()
+                        })
+                        .insert(Level);
+                }
+                continue;
+            }
             let size = Vec2::new(TILE_SIZE, TILE_SIZE);
             spawn_tile(commands, size, center, textures.ground.clone());
         }
