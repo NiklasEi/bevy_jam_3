@@ -1,3 +1,7 @@
+# Truffle Run
+
+Submission for Bevy Jam #3
+
 A truffle pig looking for truffles ^^
 
 Everything that isn't a truffle is eaten to fill the always depleting hunger bar. Food has a bunch of positive and negative side effects.

@@ -5,8 +5,8 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
-use bevy_game::{GamePlugin, HEIGHT, WIDTH};
 use std::io::Cursor;
+use truffle_run::{GamePlugin, HEIGHT, WIDTH};
 use winit::window::Icon;
 
 fn main() {
@@ -18,7 +18,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Bevy game".to_string(), // ToDo
+                        title: "Truffle Run".to_string(),
                         resolution: (WIDTH, HEIGHT).into(),
                         canvas: Some("#bevy".to_owned()),
                         resizable: false,

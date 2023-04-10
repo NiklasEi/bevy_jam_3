@@ -3,7 +3,7 @@ use crate::loading::TextureAssets;
 use crate::physics::PhysicsSystems;
 use crate::{GameState, HEIGHT};
 pub use bevy::prelude::*;
-use rand::{thread_rng, Rng};
+use rand::Rng;
 
 pub const PLATFORM_Z: f32 = 8.;
 pub const PLATFORM_HEIGHT: f32 = TILE_SIZE;

@@ -11,12 +11,11 @@ on:
         required: true
         type: string
 
-# ToDo: adapt names
 env:
   # heads-up: this value is used as a pattern in an sed command as a workaround for a trunk issue
   #   if you use special characters, take a look at the 'Make paths relative' step in the 'build-web' job
-  GAME_EXECUTABLE_NAME: bevy_game
-  GAME_OSX_APP_NAME: BevyGame
+  GAME_EXECUTABLE_NAME: truffle_run
+  GAME_OSX_APP_NAME: TruffleRun
 
 permissions:
   contents: write
@@ -132,10 +131,6 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - name: Install dotnet
-        uses: actions/setup-dotnet@v3
-        with:
-          global-json-file: build/windows/installer/global.json
       - name: Build release
         run: |
           cargo build --release
@@ -148,8 +143,6 @@ jobs:
         with:
           files: target/release/assets/ target/release/credits/ target/release/${{ env.GAME_EXECUTABLE_NAME }}.exe
           dest: ${{ env.GAME_EXECUTABLE_NAME }}_windows.zip
-      - name: Create Installer
-        run: dotnet build -c Release build/windows/installer/Installer.wixproj --output installer
       - name: Upload release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -158,14 +151,6 @@ jobs:
           asset_name: ${{ env.GAME_EXECUTABLE_NAME }}_${{ env.VERSION }}_windows.zip
           tag: ${{ github.ref }}
           overwrite: true
-      - name: Upload installer
-        uses: svenstaro/upload-release-action@v2
-        with:
-         repo_token: ${{ secrets.GITHUB_TOKEN }}
-         file: installer/en-US/installer.msi
-         asset_name: ${{ env.GAME_EXECUTABLE_NAME }}_${{ steps.tag.outputs.tag }}_windows.msi
-         release_name: ${{ env.VERSION }}
-         overwrite: true
 
   build-web:
     runs-on: ubuntu-latest
